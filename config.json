@@ -1,0 +1,11 @@
+{
+    "terraform_paths": {
+        "root_folder": "iac-tests/",   
+        "infrastructure_folder": "infrastructure/",  
+        "test_folder": "test/"        
+    },
+    "file_paths": {
+        "instance_file": "lambda.tf",                        
+        "provider_file": "providers.tf"                      
+    }
+}
