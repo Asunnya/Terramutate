@@ -41,19 +41,23 @@ class Config:
         return os.path.join(self.infrastructure_folder, self.provider_file)
 
 class MutationFramework:
-    def __init__(self, original_terraform_path, config_file_path):
+    def __init__(self, original_terraform_path, config_file_path, mutation_mode="individual"):
         
         """
         Init framework
         Parameters:
         - original_terraform_path: path to the original terraform project
         - config_file_path: path to the config file
+        - mutation_mode: mutation mode to be applied (individual or combined)
+            if individual, each mutation = program
+            if combined, all mutations from a category = program
         """
         
         self.config = Config(config_file_path)
         self.original_terraform_path = original_terraform_path
         self.copy_path = os.path.join(original_terraform_path, "terraform_mutated_copy")
         self.results = []
+        self.mutation_mode = mutation_mode
 
         if os.path.exists(self.copy_path):
             shutil.rmtree(self.copy_path)
@@ -117,20 +121,50 @@ class MutationFramework:
         instance_mutation.set_file_path(project_path, self.config.get_instance_file_path())
         provider_mutation.set_file_path(project_path, self.config.get_provider_file_path())
 
-        return [instance_mutation, provider_mutation]
+        if self.mutation_mode == "individual":
+            return [instance_mutation, provider_mutation]
+        else:
+            return {"provider": [provider_mutation], "instance": [instance_mutation]}
 
-    def apply_and_test_mutation(self, mutation):
+    def replace_original_with_mutated(self, mutation_type):
         """
-        Apply the mutation and run the tests    
+        Replace the original Terraform configuration with the mutated one.
+        """
+        mutated_file = f"{mutation_type}_mutated.tf"
+        original_file = mutation_type + ".tf"
+        
+        if os.path.exists(mutated_file):
+            backup_file = f"{original_file}.backup"
+            if os.path.exists(original_file):
+                os.rename(original_file, backup_file)
+            
+            os.rename(mutated_file, original_file)
+            print(f"Replaced {original_file} with {mutated_file}")
+
+    def apply_and_test_mutation(self, mutation, category=None):
+        """
+        Apply the mutation(s), replace original files with mutated files, and run the tests.
         Parameters:
         - mutation: mutation to be applied
+        - category: category of the mutation if mutation_mode is combined
         """
-        print(f"Applying mutation {mutation.__class__.__name__}")
-        mutation.apply_mutation()
+        # Minha ideia aqui é, quando for categorizado, por exemplo, provider, todos os tipos de operadores que podem ser colocados em provider sejam aplicados como um programa só de mutação
+        # E depois, teriamos outro programa mutado com outra categoria, com o conjunto de operadores dela
+        # Se for individual, cada operador é um programa. 
+        # Ainda não está 100% implementado, mas a ideia é essa
+        if category:
+            # Apply all mutations in the same category in a unique program
+            print(f"Applying categorized mutation {category}")
+            mutation.apply_categorized_mutation(mutation)
+        else:
+            print(f"Applying mutation {mutation.__class__.__name__}")
+            mutation.apply_mutation()
+            self.replace_original_with_mutated(mutation.mutation_type)
 
+      
         test_dir = os.path.join(self.copy_path, "iac-tests/infrastructure/test") # todo make this dinamic because when i tried is giving me a lot erros idk why
-        
-        output_file_path = os.path.join(test_dir, f"{mutation.__class__.__name__}_output.txt")
+        output_file_name = f"{category}_output.txt" if category else f"{mutation.__class__.__name__}_output.txt"
+        output_file_path = os.path.join(test_dir, output_file_name)
         with open(output_file_path, 'w') as output_file:
             try:
                 subprocess.run(["go", "test", "-v"],
@@ -151,16 +185,23 @@ class MutationFramework:
             "output": output
         })
 
-        self.revert_mutations(mutation)
+        if category:
+            for mut in mutation:
+                self.revert_mutations(mut)
+        else:
+            self.revert_mutations(mutation)
 
         return success
     
     def run(self):
         project_path = self.create_copy()
         mutations = self.get_mutations(project_path)
-
-        for mutation in mutations:
-             self.apply_and_test_mutation(mutation)
+        if self.mutation_mode == "categorized":
+           for category, mutations_group in mutations.items():
+               self.apply_and_test_mutation(mutations_group, category=category)
+        else:  
+            for mutation in mutations:
+                self.apply_and_test_mutation(mutation)
 
         self.show_results()
 

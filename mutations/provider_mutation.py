@@ -1,26 +1,18 @@
-import os
 from mutations.base_mutation import BaseMutation
 import re
 
 class ProviderMutation(BaseMutation):
+    def __init__(self, mutation_type=None, patterns=None, original_file_path="provider.tf"):
+        super().__init__(mutation_type, patterns, original_file_path=original_file_path)
+
     def apply_mutation(self):
-      
-        mutated_content = []
+        """ Apply individual mutation to the file """
 
-        with open(self.file_path, 'r') as file:
-            self.original_content = file.readlines()
-        
-        # for line in self.original_content:
-        #     mutated_content.append(re.sub(r'aws', 'google', line))
+        self.set_file_path(project_path=".", file_path=self.file_path)
 
-        mutated_content = [re.sub(r'provider "aws"', 'provider "google"', line) for line in self.original_content]
+        self.apply_individual_mutation()
 
-
-
-        with open(self.file_path, 'w') as file:
-            file.writelines(mutated_content)
-
-        print(f"Mutation {self.__class__.__name__} applied to {self.file_path}")
-
-        print("=== Diff file mutated ===")
+        print("==== DIFF BETWEEN ORIGINAL AND MUTATED FILE ====")
+        with open(self.mutated_file_path, 'r') as file:
+            mutated_content = file.readlines()
         self.show_diff(mutated_content)

@@ -1,0 +1,20 @@
+mutation_mode: "individual"  # "individual" or "categorized"
+
+mutations:
+  - mutation_type: "provider_aws_to_google"
+    file_type: "provider"
+    patterns:
+      - pattern: 'provider "aws"'
+        replacement: 'provider "google"'
+
+  - mutation_type: "region_us_east_to_eu_west"
+    file_type: "provider"
+    patterns:
+      - pattern: 'region = "us-east-1"'
+        replacement: 'region = "eu-west-1"'
+
+  - mutation_type: "instance_type_t2_to_t3"
+    file_type: "instance"
+    patterns:
+      - pattern: 'instance_type = "t2.micro"'
+        replacement: 'instance_type = "t3.micro"'
