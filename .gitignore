@@ -3,9 +3,18 @@
 *.pyo
 *.pyd
 __pycache__/
+brainstorm.*
+brainstorm/
+brainstorm-*.dist-info/
+terraform.*
+terraform*/
+.pytest_cache/
+app.egg-info/
+
 
 # Ignore virtual environment directories
 venv/
 env/
 ENV/
 .venv/
+brainstorm

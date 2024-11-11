@@ -1,0 +1,160 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.7, pytest-8.3.3, pluggy-1.5.0 -- /home/asunnya/Insync/Asunnyya@hotmail.com/OneDrive/DocArch/terraform_tests/terraform-mutation/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/asunnya/Insync/Asunnyya@hotmail.com/OneDrive/DocArch/terraform_tests/terraform-mutation
+collecting ... collected 17 items
+
+tests/test_base_mutation.py::TestBaseMutation::test_initialization PASSED [  5%]
+tests/test_base_mutation.py::TestBaseMutation::test_set_file_path PASSED [ 11%]
+tests/test_base_mutation.py::TestBaseMutation::test_apply_mutation PASSED [ 17%]
+tests/test_base_mutation.py::TestBaseMutation::test_revert_mutation PASSED [ 23%]
+tests/test_base_mutation.py::TestBaseMutation::test_mutation_failure PASSED [ 29%]
+tests/test_base_mutation.py::TestBaseMutation::test_different_patterns[provider "aws"-provider "google"] PASSED [ 35%]
+tests/test_base_mutation.py::TestBaseMutation::test_different_patterns[t2.micro-t3.micro] PASSED [ 41%]
+tests/test_base_mutation.py::TestBaseMutation::test_different_patterns[region = "us-east-1"-region = "eu-west-1"] PASSED [ 47%]
+tests/test_loader.py::test_load_config_json_success PASSED               [ 52%]
+tests/test_loader.py::test_load_config_json_file_not_found PASSED        [ 58%]
+tests/test_loader.py::test_load_config_yaml_success PASSED               [ 64%]
+tests/test_loader.py::test_load_config_yaml_invalid_format PASSED        [ 70%]
+tests/test_mutation_framework.py::test_initialize_framework PASSED       [ 76%]
+tests/test_mutation_framework.py::test_load_mutation[individual] PASSED  [ 82%]
+tests/test_mutation_framework.py::test_load_mutation[categorized] FAILED [ 88%]
+tests/test_mutation_framework.py::test_apply_mutation FAILED             [ 94%]
+tests/test_mutation_framework.py::test_mutation_results FAILED           [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_load_mutation[categorized] ________________________
+
+terraform_project = '/tmp/pytest-of-asunnya/pytest-14/test_load_mutation_categorized0/terraform_project'
+mutation_mode = 'categorized'
+
+    @pytest.mark.parametrize("mutation_mode", ["individual", "categorized"])
+    def test_load_mutation(terraform_project, mutation_mode):
+        config_json = {"terraform_paths": {"infrastructure_folder": "infrastructure/"}}
+        config_yaml = {
+            "mutation_mode": mutation_mode,
+            "mutation_categories": ["POR"],
+            "mutations": [{
+                "category": "POR",
+                "id": "1_test",
+                "file_path": "provider.tf",
+                "file_type": "provider",
+                "patterns": [{"pattern": "aws", "replacement": "google"}]
+            }
+            ,
+            {
+                "category": "VOR",
+                "id": "2_region_us_east_to_eu_west",
+                "file_path": "provider.tf",
+                "file_type": "provider",
+                "patterns": [{"pattern": 'region = "us-east-1"', "replacement": 'region = "eu-west-1"'}]
+    
+            }
+            ]
+        }
+    
+        framework = MutationFramework(terraform_project, config_json, config_yaml)
+        mutations = framework.load_mutation()
+    
+        if mutation_mode == "individual":
+            assert isinstance(mutations, list)
+            for mutation in mutations:
+                assert isinstance(mutation, dict)
+                assert "id" in mutation
+                assert "category" in mutation
+                assert "patterns" in mutation
+        else:
+            assert isinstance(mutations, list)
+            print(mutations)
+            for category_dict in mutations:
+                assert isinstance(category_dict, dict)
+                for category, mutation_list in category_dict.items():
+>                   assert category in ["POR", "VOR"]
+E                   AssertionError: assert 'id' in ['POR', 'VOR']
+
+tests/test_mutation_framework.py:99: AssertionError
+----------------------------- Captured stdout call -----------------------------
+[{'id': '1_test', 'category': 'POR', 'file_type': 'provider', 'file_path': 'provider.tf', 'mutation_type': None, 'patterns': [{'pattern': 'aws', 'replacement': 'google'}]}, {'id': '2_region_us_east_to_eu_west', 'category': 'VOR', 'file_type': 'provider', 'file_path': 'provider.tf', 'mutation_type': None, 'patterns': [{'pattern': 'region = "us-east-1"', 'replacement': 'region = "eu-west-1"'}]}]
+_____________________________ test_apply_mutation ______________________________
+
+framework = <app.framework.MutationFramework object at 0x7d5118a9bc80>
+
+    def test_apply_mutation(framework):
+        project_path = framework.create_copy()
+        provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+    
+        if not os.path.exists(provider_file):
+            with open(provider_file, "w") as f:
+                f.write('provider "aws" { region = "us-east-1" }')
+    
+        mutation = framework.config_yaml["mutations"][0]
+    
+>       framework.apply_mutation(mutation, project_path)
+
+tests/test_mutation_framework.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/framework.py:142: in apply_mutation
+    Mutation.apply_mutation()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.mutations.base_mutation.BaseMutation object at 0x7d5118be3c80>
+
+    def apply_mutation(self):
+        """
+        Apply the mutation to the file.
+        """
+    
+        if not self.file_path:
+            raise ValueError("Error: File path not set.")
+        if not os.path.exists(self.file_path):
+>           raise FileNotFoundError(f"Error: File {self.file_path} not found.")
+E           FileNotFoundError: Error: File /tmp/pytest-of-asunnya/pytest-14/test_apply_mutation1/terraform_project/terraform_mutated_copy/provider.tf not found.
+
+app/mutations/base_mutation.py:55: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_apply_mutation1/terraform_project/terraform_mutated_copy
+____________________________ test_mutation_results _____________________________
+
+framework = <app.framework.MutationFramework object at 0x7d5118abf140>
+
+    def test_mutation_results(framework):
+        project_path = framework.create_copy()
+        provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+    
+        if not os.path.exists(provider_file):
+            with open(provider_file, "w") as f:
+                f.write('provider "aws" { region = "us-east-1" }')
+    
+>       framework.run()
+
+tests/test_mutation_framework.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/framework.py:201: in run
+    self.apply_mutation(mutation_dict, project_path)
+app/framework.py:142: in apply_mutation
+    Mutation.apply_mutation()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.mutations.base_mutation.BaseMutation object at 0x7d5118abd580>
+
+    def apply_mutation(self):
+        """
+        Apply the mutation to the file.
+        """
+    
+        if not self.file_path:
+            raise ValueError("Error: File path not set.")
+        if not os.path.exists(self.file_path):
+>           raise FileNotFoundError(f"Error: File {self.file_path} not found.")
+E           FileNotFoundError: Error: File /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy/provider.tf not found.
+
+app/mutations/base_mutation.py:55: FileNotFoundError
+----------------------------- Captured stdout call -----------------------------
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy
+Removed existing copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy/
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy
+=========================== short test summary info ============================
+FAILED tests/test_mutation_framework.py::test_load_mutation[categorized] - As...
+FAILED tests/test_mutation_framework.py::test_apply_mutation - FileNotFoundEr...
+FAILED tests/test_mutation_framework.py::test_mutation_results - FileNotFound...
+========================= 3 failed, 14 passed in 0.05s =========================
