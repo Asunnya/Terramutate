@@ -25,7 +25,7 @@ tests/test_mutation_framework.py::test_mutation_results FAILED           [100%]
 =================================== FAILURES ===================================
 _______________________ test_load_mutation[categorized] ________________________
 
-terraform_project = '/tmp/pytest-of-asunnya/pytest-14/test_load_mutation_categorized0/terraform_project'
+terraform_project = '/tmp/pytest-of-asunnya/pytest-18/test_load_mutation_categorized0/terraform_project'
 mutation_mode = 'categorized'
 
     @pytest.mark.parametrize("mutation_mode", ["individual", "categorized"])
@@ -77,11 +77,11 @@ tests/test_mutation_framework.py:99: AssertionError
 [{'id': '1_test', 'category': 'POR', 'file_type': 'provider', 'file_path': 'provider.tf', 'mutation_type': None, 'patterns': [{'pattern': 'aws', 'replacement': 'google'}]}, {'id': '2_region_us_east_to_eu_west', 'category': 'VOR', 'file_type': 'provider', 'file_path': 'provider.tf', 'mutation_type': None, 'patterns': [{'pattern': 'region = "us-east-1"', 'replacement': 'region = "eu-west-1"'}]}]
 _____________________________ test_apply_mutation ______________________________
 
-framework = <app.framework.MutationFramework object at 0x7d5118a9bc80>
+framework = <app.framework.MutationFramework object at 0x7b533de40ad0>
 
     def test_apply_mutation(framework):
         project_path = framework.create_copy()
-        provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+        provider_file = os.path.join(project_path, "provider.tf")
     
         if not os.path.exists(provider_file):
             with open(provider_file, "w") as f:
@@ -89,37 +89,24 @@ framework = <app.framework.MutationFramework object at 0x7d5118a9bc80>
     
         mutation = framework.config_yaml["mutations"][0]
     
->       framework.apply_mutation(mutation, project_path)
-
-tests/test_mutation_framework.py:116: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-app/framework.py:142: in apply_mutation
-    Mutation.apply_mutation()
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-
-self = <app.mutations.base_mutation.BaseMutation object at 0x7d5118be3c80>
-
-    def apply_mutation(self):
-        """
-        Apply the mutation to the file.
-        """
+        framework.apply_mutation(mutation, project_path)
     
-        if not self.file_path:
-            raise ValueError("Error: File path not set.")
-        if not os.path.exists(self.file_path):
->           raise FileNotFoundError(f"Error: File {self.file_path} not found.")
-E           FileNotFoundError: Error: File /tmp/pytest-of-asunnya/pytest-14/test_apply_mutation1/terraform_project/terraform_mutated_copy/provider.tf not found.
+        with open(provider_file, "w") as f:
+>           content = f.read()
+E           io.UnsupportedOperation: not readable
 
-app/mutations/base_mutation.py:55: FileNotFoundError
+tests/test_mutation_framework.py:119: UnsupportedOperation
 ----------------------------- Captured stdout call -----------------------------
-Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_apply_mutation1/terraform_project/terraform_mutated_copy
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-18/test_apply_mutation1/terraform_project/terraform_mutated_copy
+Backup created at /tmp/pytest-of-asunnya/pytest-18/test_apply_mutation1/terraform_project/terraform_mutated_copy/provider.tf.bckp
+File /tmp/pytest-of-asunnya/pytest-18/test_apply_mutation1/terraform_project/terraform_mutated_copy/provider.tf has been modified successfully.
 ____________________________ test_mutation_results _____________________________
 
-framework = <app.framework.MutationFramework object at 0x7d5118abf140>
+framework = <app.framework.MutationFramework object at 0x7b533de41fd0>
 
     def test_mutation_results(framework):
         project_path = framework.create_copy()
-        provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+        provider_file = os.path.join(project_path, "provider.tf")
     
         if not os.path.exists(provider_file):
             with open(provider_file, "w") as f:
@@ -129,13 +116,13 @@ framework = <app.framework.MutationFramework object at 0x7d5118abf140>
 
 tests/test_mutation_framework.py:131: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-app/framework.py:201: in run
+app/framework.py:192: in run
     self.apply_mutation(mutation_dict, project_path)
-app/framework.py:142: in apply_mutation
+app/framework.py:135: in apply_mutation
     Mutation.apply_mutation()
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-self = <app.mutations.base_mutation.BaseMutation object at 0x7d5118abd580>
+self = <app.mutations.base_mutation.BaseMutation object at 0x7b533de40f50>
 
     def apply_mutation(self):
         """
@@ -146,15 +133,15 @@ self = <app.mutations.base_mutation.BaseMutation object at 0x7d5118abd580>
             raise ValueError("Error: File path not set.")
         if not os.path.exists(self.file_path):
 >           raise FileNotFoundError(f"Error: File {self.file_path} not found.")
-E           FileNotFoundError: Error: File /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy/provider.tf not found.
+E           FileNotFoundError: Error: File /tmp/pytest-of-asunnya/pytest-18/test_mutation_results0/terraform_project/terraform_mutated_copy/provider.tf not found.
 
 app/mutations/base_mutation.py:55: FileNotFoundError
 ----------------------------- Captured stdout call -----------------------------
-Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy
-Removed existing copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy/
-Created copy of the project in /tmp/pytest-of-asunnya/pytest-14/test_mutation_results0/terraform_project/terraform_mutated_copy
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-18/test_mutation_results0/terraform_project/terraform_mutated_copy
+Removed existing copy of the project in /tmp/pytest-of-asunnya/pytest-18/test_mutation_results0/terraform_project/terraform_mutated_copy/
+Created copy of the project in /tmp/pytest-of-asunnya/pytest-18/test_mutation_results0/terraform_project/terraform_mutated_copy
 =========================== short test summary info ============================
 FAILED tests/test_mutation_framework.py::test_load_mutation[categorized] - As...
-FAILED tests/test_mutation_framework.py::test_apply_mutation - FileNotFoundEr...
+FAILED tests/test_mutation_framework.py::test_apply_mutation - io.Unsupported...
 FAILED tests/test_mutation_framework.py::test_mutation_results - FileNotFound...
 ========================= 3 failed, 14 passed in 0.05s =========================

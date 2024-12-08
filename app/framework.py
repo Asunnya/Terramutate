@@ -87,12 +87,9 @@ class MutationFramework:
 
 
     def load_mutation(self):
-        """Inicialize and returns a list of mutations to be applied"""
-
+        """Initialize and return a list of mutations to be applied"""
         if self.mutation_mode == "individual":
-            # Use each mutation as a program, get all mutations from the config yaml file, return a list of id 
             list_mutations = []
-
             for mutation in self.config_yaml["mutations"]:
                 mutation_dict = {
                     "id": mutation.get("id"),
@@ -105,28 +102,21 @@ class MutationFramework:
                 list_mutations.append(mutation_dict)
             return list_mutations
         elif self.mutation_mode == "categorized":
-            # Cria um dicionário para agrupar as mutações por categoria
-            categories = {cat: [] for cat in self.config_yaml.get("mutation_categories", [])}
-
-            # Itera sobre as mutações na configuração YAML e agrupa por categoria
+            categories = {}
             for mutation in self.config_yaml["mutations"]:
                 category = mutation.get("category")
-                if category in categories:
-                    mutation_dict = {
-                        "id": mutation.get("id"),
-                        "category": mutation.get("category"),
-                        "file_type": mutation.get("file_type"),
-                        "file_path": mutation.get("file_path"),
-                        "mutation_type": mutation.get("mutation_type"),
-                        "patterns": mutation.get("patterns")
-                    }
-                    categories[category].append(mutation_dict)
-
-            # Converte cada categoria e suas mutações em um dicionário separado na lista final
-            categorized_mutations = [{cat: mutations} for cat, mutations in categories.items() if mutations]
-
-            return categorized_mutations
-
+                if category not in categories:
+                    categories[category] = []
+                mutation_dict = {
+                    "id": mutation.get("id"),
+                    "category": category,
+                    "file_type": mutation.get("file_type"),
+                    "file_path": mutation.get("file_path"),
+                    "mutation_type": mutation.get("mutation_type"),
+                    "patterns": mutation.get("patterns")
+                }
+                categories[category].append(mutation_dict)
+            return categories
         else:
             raise ValueError(f"Modo de mutação desconhecido: '{self.mutation_mode}'")
     def apply_mutation(self, mutation_dict, project_path):
@@ -137,11 +127,11 @@ class MutationFramework:
         - mutation_dict: mutation to be applied
         - project_path: path to the project
         """
-        
+        infrastructure_folder = self.config_json['terraform_paths']['infrastructure_folder']
+        mutation_dict['file_path'] = os.path.join(infrastructure_folder, mutation_dict['file_path'])
+
         Mutation = BaseMutation(mutation_dict, project_path)
         Mutation.apply_mutation()
-
-       
     def test_mutation(self, mutation_dict, category ,categorized=False):
         """
         Run the tests for the mutated files.
@@ -151,12 +141,20 @@ class MutationFramework:
         """
 
         if not categorized:
-            if not mutation_dict.id:
+
+
+            if not mutation_dict['id']:
+
+                print(
+                    mutation_dict['id']
+                )
                 raise ValueError("Mutation ID not found in mutation_dict, Did u send more than one mutate?")
 
-        test_dir = os.path.join(self.copy_path, "iac-tests/infrastructure/test")
-        output_file_name = f"{category}_output.txt" if categorized else f"{mutation_dict.id}_output.txt"
+
+        test_dir = os.path.join(self.copy_path, "infrastructure/test")
+        output_file_name = f"{category}_output.txt" if categorized else f"{mutation_dict['id']}_output.txt"
         output_file_path = os.path.join(test_dir, output_file_name)
+
 
         with open(output_file_path, 'w') as output_file:
             try:
@@ -173,8 +171,8 @@ class MutationFramework:
         output = f"Test: {success} saved output file: {output_file_path}"
 
         self.mutation_results.append({
-            "mutation_dict": mutation_dict.id if not categorized else category,
-            "category": mutation_dict.category if not categorized else category,
+            "mutation_dict": mutation_dict['id']if not categorized else category,
+            "category": mutation_dict['category'] if not categorized else category,
             "success": success,
             "output": output
         })
@@ -197,10 +195,13 @@ class MutationFramework:
                #self.revert_mutations() # Clean all mutations, different from revert_mutation 
         else:  
             # The goal here is: Apply one mutation, test, revert, get the results
+            print(mutations)
             for mutation_dict in mutations:
+                print(f"Mutation: {mutation_dict['category']}")
+                category = mutation_dict['category']
                 self.apply_mutation(mutation_dict, project_path)
                 self.test_mutation(mutation_dict, category, False)
-                self.revert_mutation(mutation_dict, category)
+                #self.revert_mutation(mutation_dict, category)
 
         self.show_results()
 

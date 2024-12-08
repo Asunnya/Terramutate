@@ -105,13 +105,7 @@ def test_load_mutation(terraform_project, mutation_mode):
 
 def test_apply_mutation(framework):
     project_path = framework.create_copy()
-    
-    #create a fake provider file
-
-    
-
-    
-    provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+    provider_file = os.path.join(project_path, "provider.tf")
     
     if not os.path.exists(provider_file):
         with open(provider_file, "w") as f:
@@ -128,14 +122,13 @@ def test_apply_mutation(framework):
 
 def test_mutation_results(framework):
     project_path = framework.create_copy()
-    provider_file = os.path.join(project_path, "infrastructure", "provider.tf")
+    provider_file = os.path.join(project_path, "provider.tf")
     
     if not os.path.exists(provider_file):
         with open(provider_file, "w") as f:
             f.write('provider "aws" { region = "us-east-1" }')
     
     framework.run()
-    
-    with open(provider_file) as f:
+    with open(provider_file, "r+") as f:
         content = f.read()
         assert 'provider "google"' in content

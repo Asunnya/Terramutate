@@ -1,11 +1,11 @@
-mutation_mode: "individual"  # "individual" or "categorized"
+mutation_mode: "categorized"  # "individual" or "categorized"
 mutation_categories: [POR, VOR, ROR, DOR, NOR, AOR, SOR]  # Categories
 
 mutations:
 - category: POR
   file_type: provider
   mutation_type: provider_aws_to_google
-  file_path: provider.tf
+  file_path: providers.tf
   patterns:
   - pattern: provider "aws"
     replacement: provider "google"
@@ -14,172 +14,79 @@ mutations:
 - category: VOR
   file_type: provider
   mutation_type: region_us_east_to_eu_west
-  file_path: provider.tf
+  file_path: providers.tf
   patterns:
   - pattern: region = "us-east-1"
     replacement: region = "eu-west-1"
   id: 2_region_us_east_to_eu_west_VOR
 
-- category: ROR
-  file_type: instance
-  mutation_type: instance_type_t2_to_t3
-  file_path: main.tf
-  patterns:
-  - pattern: instance_type = "t2.micro"
-    replacement: instance_type = "t3.micro"
-  id: 3_instance_type_t2_to_t3_ROR
 
 - category: DOR
   file_type: dependency
   mutation_type: remove_depends_on
-  file_path: main.tf
+  file_path: data.tf
   patterns:
   - pattern: 'depends_on = '
     replacement: '# depends_on removed'
   id: 4_remove_depends_on_DOR
 
-- category: NOR
-  file_type: network
-  mutation_type: open_security_group
-  file_path: security.tf
-  patterns:
-  - pattern: cidr_blocks = "10.0.0.0/16"
-    replacement: cidr_blocks = "0.0.0.0/0"
-  id: 5_open_security_group_NOR
 
 - category: VOR
   file_type: configuration
   mutation_type: extreme_count_value
-  file_path: variables.tf
+  file_path: vars.tf
   patterns:
   - pattern: count = 1
     replacement: count = 1000
   id: 6_extreme_count_value_VOR
 
-- category: ROR
-  file_type: instance
-  mutation_type: invalid_instance_type
-  file_path: main.tf
-  patterns:
-  - pattern: instance_type = "t2.micro"
-    replacement: instance_type = "invalid_type"
-  id: 7_invalid_instance_type_ROR
-
-- category: DOR
-  file_type: dependency
-  mutation_type: circular_dependency
-  file_path: main.tf
-  patterns:
-  - pattern: resource "aws_instance" "example"
-    replacement: resource "aws_instance" "example" { depends_on = [aws_instance.another_example]}
-  - pattern: resource "aws_instance" "another_example"
-    replacement: resource "aws_instance" "another_example" { depends_on = [aws_instance.example]}
-  id: 8_circular_dependency_DOR
 
 - category: DOR
   file_type: dependency
   mutation_type: duplicate_dependency
-  file_path: main.tf
+  file_path: data.tf
   patterns:
-  - pattern: depends_on = [aws_security_group.example]
+  - pattern: depends_on = [ aws_lambda_function.lambda_reports]
     replacement: depends_on = [aws_security_group.example, aws_security_group.example]
   id: 9_duplicate_dependency_DOR
 
 - category: DOR
   file_type: dependency
   mutation_type: remove_critical_dependency
-  file_path: main.tf
+  file_path: data.tf
   patterns:
-  - pattern: depends_on = [aws_db_instance.example]
+  - pattern: depends_on = [aws_lambda_function.lambda_reports]
     replacement: '# depends_on removed'
   id: 10_remove_critical_dependency_DOR
 
-- category: DOR
-  file_type: dependency
-  mutation_type: cross_provider_dependency
-  file_path: main.tf
-  patterns:
-  - pattern: resource "aws_instance" "example"
-    replacement: resource "aws_instance" "example" { depends_on = [google_compute_instance.another_example]}
-  id: 11_cross_provider_dependency_DOR
-
-- category: DOR
-  file_type: dependency
-  mutation_type: non_existent_dependency
-  file_path: main.tf
-  patterns:
-  - pattern: resource "aws_instance" "example"
-    replacement: resource "aws_instance" "example" { depends_on = [aws_instance.non_existent]}
-  id: 12_non_existent_dependency_DOR
 
 - category: AOR
   file_type: provider
   mutation_type: invalid_authentication
-  file_path: provider.tf
+  file_path: providers.tf
   patterns:
   - pattern: profile = "default"
     replacement: profile = "invalid_account"
   id: 13_invalid_authentication_AOR
 
-- category: SOR
-  file_type: state
-  mutation_type: skip_terraform_import
-  file_path: state.tf
-  patterns:
-  - pattern: resource "aws_instance" "existing_instance"
-    replacement: '# missing terraform import for existing instance'
-  id: 14_skip_terraform_import_SOR
-
-- category: ROR
-  file_type: resource
-  mutation_type: extended_timeout
-  file_path: main.tf
-  patterns:
-  - pattern: timeout = "10m"
-    replacement: timeout = "1h"
-  id: 15_extended_timeout_ROR
-
 - category: DOR
   file_type: dependency
   mutation_type: remove_implicit_dependency
-  file_path: main.tf
+  file_path: data.tf
   patterns:
   - pattern: depends_on = [aws_db_instance.example]
     replacement: '# depends_on removed'
   id: 16_remove_implicit_dependency_DOR
 
-- category: NOR
-  file_type: network
-  mutation_type: open_sensitive_ports
-  file_path: security.tf
-  patterns:
-  - pattern: cidr_blocks = "10.0.0.0/16"
-    replacement: cidr_blocks = "0.0.0.0/0"
-  id: 17_open_sensitive_ports_NOR
 
 - category: POR
   file_type: provider
   mutation_type: provider_incompatibility
-  file_path: provider.tf
+  file_path: providers.tf
   patterns:
   - pattern: provider "aws"
     replacement: provider "google"
   id: 18_provider_incompatibility_POR
 
-- category: NOR
-  file_type: configuration
-  mutation_type: invalid_network_variable
-  file_path: variables.tf
-  patterns:
-  - pattern: variable "vpc_cidr" { default = "10.0.0.0/16" }
-    replacement: variable "vpc_cidr" { default = "300.0.0.0/16" }
-  id: 19_invalid_network_variable_NOR
 
-- category: SOR
-  file_type: state
-  mutation_type: disable_state_locking
-  file_path: state.tf
-  patterns:
-  - pattern: locking_enabled = true
-    replacement: locking_enabled = false
-  id: 20_disable_state_locking_SOR
+

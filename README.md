@@ -1,31 +1,40 @@
-
-
 # Terraform Mutation Framework
 
-Este projeto é um framework para gerar e aplicar mutações em arquivos de configuração do Terraform. Ele utiliza **Terratest** para executar testes de integração em um ambiente Terraform e **mutação de código** para verificar a robustez dos testes. O framework é capaz de criar cópias de configurações do Terraform, aplicar mutações em instâncias e provedores, e registrar os resultados dos testes executados em uma cópia do projeto.
+Este projeto é um framework para gerar e aplicar mutações em arquivos de configuração do Terraform. Ele utiliza **Terratest** para executar testes de integração em um ambiente Terraform e **mutação de código** para verificar a robustez dos testes.
+
+ O framework é capaz de criar cópias de configurações do Terraform, aplicar mutações, utilizando os operadores de mutação definidos através de uma análise qualitativa e quantitativa e registrar os resultados dos testes executados em uma cópia do projeto.
 
 ## Funcionalidades
 
 - **Criação de cópias de infraestrutura Terraform**: O framework gera uma cópia completa dos arquivos de configuração do Terraform para aplicar as mutações sem modificar o projeto original.
-- **Mutações de configuração**: Atualmente, o framework suporta mutações em tipos de instância (`InstanceTypeMutation`) e provedores (`ProviderMutation`).
+- **Mutações de configuração**: Atualmente, o framework suporta mutações todas as mutações definidas em `config.yaml`, onde há cada operador de mutação definido e sua categorização.
 - **Execução de testes com Terratest**: Usa o `go test` para executar testes de integração no Terraform, salvando a saída dos testes em arquivos.
 - **Relatório de mutações**: Após aplicar e reverter mutações, o framework gera um relatório indicando o sucesso ou falha de cada mutação, além de salvar a saída detalhada dos testes em arquivos de texto.
 
 ## Estrutura do Projeto
 
 ```bash
-├── iac-tests                # Diretório com as configurações originais do Terraform
-│   ├── infrastructure        # Infraestrutura Terraform (arquivos .tf)
-│   └── test                  # Arquivos de teste Terratest
-├── terraform-mutation        # Diretório do framework de mutação
-│   ├── config.json           # Arquivo de configuração
-│   ├── framework.py          # Código principal do framework
-│   ├── main.py               # Script principal para executar as mutações
-│   └── mutations             # Diretório com classes de mutações
-│       ├── base_mutation.py  # Classe base para mutações
-│       ├── instance_type_mutation.py  # Mutações de tipo de instância
-│       └── provider_mutation.py  # Mutações de provider
-└── terraform_mutated_copy    # Diretório gerado automaticamente com a cópia da infraestrutura para aplicar as mutações
+.
+├── app
+│   ├── config
+│   │   ├── config.json
+│   │   ├── config.yaml
+│   │   ├── __init__.py
+│   │   ├── loader.py
+│   ├── framework.py
+│   ├── __init__.py
+│   ├── main.py
+│   ├── mutations
+│   │   ├── base_mutation.py
+│   │   ├── base_operators.py
+│   │   ├── __init__.py
+├── README.md
+├── setup.py
+├── terraform-mutation.code-workspace
+└── tests
+    ├── test_base_mutation.py
+    ├── test_loader.py
+    └── test_mutation_framework.py
 ```
 
 ## Requisitos
@@ -33,7 +42,7 @@ Este projeto é um framework para gerar e aplicar mutações em arquivos de conf
 - Python 3.8+
 - Go 1.15+
 - Terratest
-- AWS Cli
+- AWS CLI
 - Local Stack
 - Terraform
 
@@ -52,6 +61,11 @@ Este projeto é um framework para gerar e aplicar mutações em arquivos de conf
    python -m venv .venv
    source .venv/bin/activate
    pip install -r requirements.txt
+   ```
+
+   Alternativamente, você pode usar o `setup.py` para instalar o pacote:
+   ```bash
+   python setup.py install
    ```
 
 3. **Instale o Go, Terratest, AWS CLI, LocalStack e Configure** 
@@ -73,13 +87,9 @@ O arquivo `config.json` deve ser configurado para definir os caminhos relativos 
 ```json
 {
     "terraform_paths": {
-        "root_folder": "iac-tests/",
-        "infrastructure_folder": "infrastructure/",
-        "test_folder": "test/"
-    },
-    "file_paths": {
-        "instance_file": "lambda.tf",
-        "provider_file": "providers.tf"
+        "root_folder": "app/infrastructure/",
+        "infrastructure_folder": "app/infrastructure/",
+        "test_folder": "tests/"
     }
 }
 ```
@@ -87,8 +97,6 @@ O arquivo `config.json` deve ser configurado para definir os caminhos relativos 
 - `root_folder`: O diretório principal onde os arquivos do Terraform estão localizados.
 - `infrastructure_folder`: O subdiretório onde os arquivos `.tf` de infraestrutura estão armazenados.
 - `test_folder`: O diretório onde os testes do Terraform (Terratest) estão armazenados.
-- `instance_file`: O arquivo de instância que será alvo de mutação.
-- `provider_file`: O arquivo de provider que será alvo de mutação.
 
 ## Como Usar
 
@@ -97,14 +105,26 @@ O arquivo `config.json` deve ser configurado para definir os caminhos relativos 
    Para executar o framework de mutação, use o seguinte comando:
 
    ```bash
-   python main.py <caminho_para_o_projeto_terraform> config.json
+   python app/main.py <caminho_para_projeto> <caminho_para_config.json> [<caminho_para_config.yaml>]
    ```
 
-   Exemplo:
+   - `<caminho_para_projeto>`: Caminho para o diretório do projeto Terraform que você deseja testar.
+   - `<caminho_para_config.json>`: Caminho para o arquivo de configuração JSON que define os caminhos relativos da infraestrutura e dos arquivos de teste.
+   - `<caminho_para_config.yaml>`: (Opcional) Caminho para o arquivo de configuração YAML que define os operadores de mutação. O padrão é `config/config.yaml`.
+
+   Exemplo de execução:
 
    ```bash
-   python main.py ../ config.json
+   python app/main.py ../meu_projeto_terraform app/config/config.json
    ```
+
+   Neste exemplo, o framework irá:
+
+   - Criar uma cópia do projeto de infraestrutura especificado.
+   - Aplicar as mutações definidas no arquivo `config.yaml`.
+   - Executar os testes de integração usando Terratest.
+   - Exibir o resultado de cada mutação e o caminho dos arquivos de saída dos testes no console.
+   - Salvar a saída dos testes em arquivos `.txt` na pasta de testes do projeto copiado.
 
 2. **Resultados**:
 
