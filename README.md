@@ -1,4 +1,4 @@
-# Terraform Mutation Framework
+# Terraform Mutation Framework: Terramutate
 
 Este projeto é um framework para gerar e aplicar mutações em arquivos de configuração do Terraform. Ele utiliza **Terratest** para executar testes de integração em um ambiente Terraform e **mutação de código** para verificar a robustez dos testes.
 
