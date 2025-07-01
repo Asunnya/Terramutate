@@ -358,7 +358,24 @@ class MutationFramework:
             except (subprocess.CalledProcessError, FileNotFoundError) as e:
                 success = False
                 
-        output = f"Test: {success} saved output file: {output_file_path}"
+        # ------------------------------------------------------------------
+        # Also persist the Terratest log under the top-level research_results/
+        # directory so all artefacts are consolidated in one place.
+        # ------------------------------------------------------------------
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        research_results_dir = os.path.join(project_root, "research_results")
+        os.makedirs(research_results_dir, exist_ok=True)
+
+        research_output_path = os.path.join(research_results_dir, output_file_name)
+        try:
+            shutil.copy2(output_file_path, research_output_path)
+        except IOError as e:
+            print(f"[WARN] Could not copy Terratest output to research_results: {e}")
+
+        output = (
+            f"Test: {success} saved output file: {output_file_path}  "
+            f"and copied to {research_output_path}"
+        )
 
         # Store mutation result details, including diff when available
         self.mutation_results.append({
@@ -443,9 +460,22 @@ class MutationFramework:
                 for diff_line in result["diff"].splitlines():
                     report_lines.append(f"    {diff_line}")
                 report_lines.append("    ----- DIFF END -----")
-        report_lines.append("---------------------------------------------------------")
-        report_lines.append(f"Total mutant programs generated & tested: {len(self.mutation_results)}")
-        report_lines.append("Each program contains exactly 1 mutation, forming N mutant programs.")
+
+        # ------------------------------------------------------------------
+        # Aggregate statistics (killed vs alive) and append a compact summary
+        # This goes *after*
+        # the per-mutant details so readers can quickly spot the overall score.
+        # ------------------------------------------------------------------
+        total = len(self.mutation_results)
+        killed = sum(1 for r in self.mutation_results if not r["success"])
+        alive = total - killed
+
+        report_lines.append("") 
+        report_lines.append("Summary")
+        report_lines.append("--------")
+        report_lines.append(f"Total mutants tested : {total}")
+        report_lines.append(f"Killed (tests failed): {killed}")
+        report_lines.append(f"Alive  (tests passed): {alive}")
         report_lines.append("=========================================================\n")
 
         # Print to console
