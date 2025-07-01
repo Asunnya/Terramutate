@@ -10,7 +10,9 @@ terraform.*
 terraform*/
 .pytest_cache/
 app.egg-info/
-
+.cursorrules
+.cursor/
+.vscode/
 
 # Ignore virtual environment directories
 venv/
@@ -18,3 +20,5 @@ env/
 ENV/
 .venv/
 brainstorm
+
+terramutate.egg-info/
