@@ -27,15 +27,15 @@ def sample_config_json(tmp_path):
 def sample_config_yaml(tmp_path):
     config = {
         "mutation_mode": "individual",
-        "mutation_categories": ["POR", "VOR"],
+        "mutation_categories": ["VCR"],
         "mutations": [
             {
-                "category": "POR",
-                "file_type": "provider",
-                "mutation_type": "provider_aws_to_google",
-                "file_path": "provider.tf",
-                "patterns": [{"pattern": "aws", "replacement": "google"}],
-                "id": "1_provider_aws_to_google_POR"
+                "category": "VCR",
+                "file_type": "version_constraint",
+                "mutation_type": "VCR_1_eq_to_tilde_gt",
+                "file_path": "versions.tf",
+                "patterns": [{"pattern": "= ", "replacement": "~> "}],
+                "id": "vcr_example"
             }
         ]
     }
@@ -58,7 +58,7 @@ def test_load_config_yaml_success(sample_config_yaml):
     config = load_config_yaml(sample_config_yaml)
     assert "mutation_mode" in config
     assert "mutations" in config
-    assert len(config["mutation_categories"]) == 2
+    assert len(config["mutation_categories"]) == 1
 
 def test_load_config_yaml_invalid_format(tmp_path):
     invalid_yaml = tmp_path / "invalid.yaml"

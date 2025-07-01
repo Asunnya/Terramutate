@@ -1,7 +1,7 @@
 import sys
 import os
 import yaml
-from config.loader import load_config_json, load_config_yaml
+from app.config.loader import load_config_json, load_config_yaml
 from app.framework import MutationFramework
 # ex: python main.py ../iac-tests/ config.json
 

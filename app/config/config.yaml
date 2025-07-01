@@ -1,92 +1,420 @@
-mutation_mode: "categorized"  # "individual" or "categorized"
-mutation_categories: [POR, VOR, ROR, DOR, NOR, AOR, SOR]  # Categories
+mutation_mode: "individual"
+mutation_categories: [VCR, VLI, SAR, IPR, PDR, MDR, VDR, PAR, RCR, RAVR, CMR, PVCR, NSRR, IVR]
+
+# Filtros aplicados pelo framework para selecionar apenas certos operadores
+include_categories: [VCR, IPR, IVR, PDR, PVCR, RCR]
+include_mutation_types:
+  - VCR_3_tilde_gt_to_gte
+  - IPR_ACT_WC
+  - IVR_VAL_UP
+  - PDR_NAME_REPLACE
+  - PVCR_INV_UP
+  - RCR_SG_CIDR_UP
+  - RCR_SG_FROM_UP
+  - RCR_SG_TO_UP
+
 
 mutations:
-- category: POR
+
+# ---------------------------------------------------------------------------
+# Version-Constraint Faults
+# ---------------------------------------------------------------------------
+- category: VCR
+  file_type: version_constraint
+  mutation_type: VCR_1_eq_to_tilde_gt
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*"
+      replacement: "version ~> "
+  id: vcr_1_eq_to_tilde_gt
+
+- category: VCR
+  file_type: version_constraint
+  mutation_type: VCR_2_eq_to_gte
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*"
+      replacement: "version >= "
+  id: vcr_2_eq_to_gte
+
+- category: VCR
+  file_type: version_constraint
+  mutation_type: VCR_3_tilde_gt_to_gte
+  patterns:
+    - pattern: "(?i)version\\s*~>\\s*"
+      replacement: "version >= "
+    - pattern: "(?i)version\\s*=\\s*\"~>\\s*"
+      replacement: "version = \">= "
+  id: vcr_3_tilde_gt_to_gte
+
+# Version Literal Increment (place-holder numeric replacements)
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_MAJ_plus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"0.0.0\""
+      replacement: "version = \"1.0.0\""  # placeholder example
+  id: vli_maj_plus
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_MAJ_minus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"1.0.0\""
+      replacement: "version = \"0.0.0\""  # placeholder example
+  id: vli_maj_minus
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_MIN_plus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"0.0.0\""
+      replacement: "version = \"0.1.0\""
+  id: vli_min_plus
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_MIN_minus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"0.1.0\""
+      replacement: "version = \"0.0.0\""
+  id: vli_min_minus
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_PAT_plus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"0.0.0\""
+      replacement: "version = \"0.0.1\""
+  id: vli_pat_plus
+- category: VLI
+  file_type: version_literal
+  mutation_type: VLI_PAT_minus
+  patterns:
+    - pattern: "(?i)version\\s*=\\s*\"0.0.1\""
+      replacement: "version = \"0.0.0\""
+  id: vli_pat_minus
+
+# ---------------------------------------------------------------------------
+# Static-Analysis Suppression Faults
+# ---------------------------------------------------------------------------
+- category: SAR
+  file_type: comment
+  mutation_type: SAR_DEL
+  patterns:
+    - pattern: "(?i)#checkov:skip="
+      replacement: ""  # delete entire suppression comment
+  id: sar_del
+- category: SAR
+  file_type: comment
+  mutation_type: SAR_INS
+  patterns:
+    - pattern: "(?i)^resource "
+      replacement: "#checkov:skip=CKV_AWS_20 \"injected by SAR_INS\"\nresource "
+  id: sar_ins
+- category: SAR
+  file_type: comment
+  mutation_type: SAR_TOOL
+  patterns:
+    - pattern: "(?i)#checkov:"
+      replacement: "#tfsec:"
+  id: sar_tool
+- category: SAR
+  file_type: comment
+  mutation_type: SAR_ID
+  patterns:
+    - pattern: "(?i)#checkov:skip=CKV_AWS_20"
+      replacement: "#checkov:skip=CKV_AWS_02"
+  id: sar_id
+
+# ---------------------------------------------------------------------------
+# General Maintenance Faults
+# ---------------------------------------------------------------------------
+# IPR – IAM Policy Replacement
+- category: IPR
+  file_type: iam_policy
+  mutation_type: IPR_ACT_DEL
+  patterns:
+    - pattern: '(?i)action\s*=\s*\[.*?\]'
+      replacement: "Action = []"  # remove one action – simplified
+    - pattern: '(?i)"Action"\s*:\s*\[.*?\]'
+      replacement: '"Action": []'
+  id: ipr_act_del
+- category: IPR
+  file_type: iam_policy
+  mutation_type: IPR_ACT_WC
+  patterns:
+    - pattern: '(?i)action\s*=\s*\[.*?\]'
+      replacement: 'Action = "*"'
+    - pattern: '(?i)"Action"\s*:\s*\[.*?\]'
+      replacement: '"Action": ["*"]'
+  id: ipr_act_wc
+- category: IPR
+  file_type: iam_policy
+  mutation_type: IPR_RES_WC
+  patterns:
+    - pattern: '(?i)resource\s*=\s*(\[.*?\]|"[^"]+")'
+      replacement: "Resource = \"*\""
+  id: ipr_res_wc
+
+# PDR – Provider Declaration Replacement
+- category: PDR
   file_type: provider
-  mutation_type: provider_aws_to_google
-  file_path: providers.tf
+  mutation_type: PDR_DEL
   patterns:
-  - pattern: provider "aws"
-    replacement: provider "google"
-  id: 0_provider_aws_to_google_POR
-
-- category: VOR
+    - pattern: "(?i)provider \"aws\"[\\s\\S]*?}"
+      replacement: ""  # delete block
+  id: pdr_del
+- category: PDR
   file_type: provider
-  mutation_type: region_us_east_to_eu_west
-  file_path: providers.tf
+  mutation_type: PDR_ADD
   patterns:
-  - pattern: region = "us-east-1"
-    replacement: region = "eu-west-1"
-  id: 2_region_us_east_to_eu_west_VOR
-
-
-- category: DOR
-  file_type: dependency
-  mutation_type: remove_depends_on
-  file_path: data.tf
-  patterns:
-  - pattern: 'depends_on = '
-    replacement: '# depends_on removed'
-  id: 4_remove_depends_on_DOR
-
-
-- category: VOR
-  file_type: configuration
-  mutation_type: extreme_count_value
-  file_path: vars.tf
-  patterns:
-  - pattern: count = 1
-    replacement: count = 1000
-  id: 6_extreme_count_value_VOR
-
-
-- category: DOR
-  file_type: dependency
-  mutation_type: duplicate_dependency
-  file_path: data.tf
-  patterns:
-  - pattern: depends_on = [ aws_lambda_function.lambda_reports]
-    replacement: depends_on = [aws_security_group.example, aws_security_group.example]
-  id: 9_duplicate_dependency_DOR
-
-- category: DOR
-  file_type: dependency
-  mutation_type: remove_critical_dependency
-  file_path: data.tf
-  patterns:
-  - pattern: depends_on = [aws_lambda_function.lambda_reports]
-    replacement: '# depends_on removed'
-  id: 10_remove_critical_dependency_DOR
-
-
-- category: AOR
+    - pattern: "(?i)provider \"aws\""
+      replacement: "provider \"aws\"\nprovider \"aws_duplicate\""  # duplicate block
+  id: pdr_add
+- category: PDR
   file_type: provider
-  mutation_type: invalid_authentication
-  file_path: providers.tf
+  mutation_type: PDR_CFG
   patterns:
-  - pattern: profile = "default"
-    replacement: profile = "invalid_account"
-  id: 13_invalid_authentication_AOR
-
-- category: DOR
-  file_type: dependency
-  mutation_type: remove_implicit_dependency
-  file_path: data.tf
-  patterns:
-  - pattern: depends_on = [aws_db_instance.example]
-    replacement: '# depends_on removed'
-  id: 16_remove_implicit_dependency_DOR
-
-
-- category: POR
+    - pattern: '(?i)region\s*=\s*"us-east-1"'
+      replacement: "region = \"eu-central-1\""
+  id: pdr_cfg
+- category: PDR
   file_type: provider
-  mutation_type: provider_incompatibility
-  file_path: providers.tf
+  mutation_type: PDR_NAME_REPLACE
   patterns:
-  - pattern: provider "aws"
-    replacement: provider "google"
-  id: 18_provider_incompatibility_POR
+    - pattern: '(?i)provider\s*"aws"'
+      replacement: 'provider "google"'
+  id: pdr_name_replace
+
+# MDR – Module Declaration Replacement
+- category: MDR
+  file_type: module
+  mutation_type: MDR_DEL  
+  patterns:
+    - pattern: "(?i)module \"[a-zA-Z0-9_-]+\"[\\s\\S]*?}"
+      replacement: ""  # delete module
+  id: mdr_del
+- category: MDR
+  file_type: module
+  mutation_type: MDR_ADD
+  patterns:
+    - pattern: "(?i)module \"existing\""
+      replacement: "module \"existing\"\nmodule \"duplicate\" { source = \"../duplicate\" }"
+  id: mdr_add
+- category: MDR
+  file_type: module
+  mutation_type: MDR_SRC
+  patterns:
+    - pattern: '(?i)source\s*=\s*"[^\"]+"'
+      replacement: "source = \"../invalid\""
+  id: mdr_src
+- category: MDR
+  file_type: module
+  mutation_type: MDR_VER
+  patterns:
+    - pattern: '(?i)version\s*=\s*"(\d+)\.(\d+)\.(\d+)"'
+      replacement: "version = \"999.999.999\""  # placeholder version
+  id: mdr_ver
+
+# VDR – Variable Declaration Replacement
+- category: VDR
+  file_type: variable
+  mutation_type: VDR_TYPE
+  patterns:
+    - pattern: '(?i)type\s*=\s*string'
+      replacement: "type    = number"
+  id: vdr_type
+- category: VDR
+  file_type: variable
+  mutation_type: VDR_DEF
+  patterns:
+    - pattern: '(?i)default\s*=.*'
+      replacement: "# default removed"
+  id: vdr_def
+- category: VDR
+  file_type: variable
+  mutation_type: VDR_SENS
+  patterns:
+    - pattern: '(?i)sensitive\s*=\s*true'
+      replacement: "# sensitive removed"
+  id: vdr_sens
+
+# PAR – Parameter Attribute Replacement
+- category: PAR
+  file_type: parameter
+  mutation_type: PAR_BOOL
+  patterns:
+    - pattern: '(?i)=\s*true'
+      replacement: "= false"
+  id: par_bool
+- category: PAR
+  file_type: parameter
+  mutation_type: PAR_NUM
+  patterns:
+    - pattern: '(?i)=\s*1'
+      replacement: "= 2"
+  id: par_num
+- category: PAR
+  file_type: parameter
+  mutation_type: PAR_STR
+  patterns:
+    - pattern: "(?i)resource_name"
+      replacement: "resource_namx"  # typo
+  id: par_str
+
+# RCR – Resource Configuration Replacement
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_TAG_DEL
+  patterns:
+    - pattern: '^\\s*(Name|CostCenter|Environment)\\s*=\\s*"[^"]+"'
+      replacement: "# mandatory tag removed"
+  id: rcr_tag_del
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_SG_CIDR_UP
+  patterns:
+    - pattern: '(?i)cidr_blocks\s*=\s*\[[^\]]+\]'
+      replacement: 'cidr_blocks = ["0.0.0.0/0"]'
+  id: rcr_sg_cidr_up
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_SG_FROM_UP
+  patterns:
+    - pattern: '(?i)from_port\s*=\s*[0-9]+'
+      replacement: 'from_port = 0'
+  id: rcr_sg_from_up
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_SG_TO_UP
+  patterns:
+    - pattern: '(?i)to_port\s*=\s*[0-9]+'
+      replacement: 'to_port   = 65535'
+  id: rcr_sg_to_up
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_ATTR
+  patterns:
+    - pattern: '(?i)(instance_type|kms_key_id)\s*=\s*"[^"]+"'
+      replacement: '\1 = "__mutated__"'
+  id: rcr_attr
+- category: RCR
+  file_type: resource
+  mutation_type: RCR_DEL
+  patterns:
+    - pattern: '(?i)resource\s+"aws_s3_bucket"[\s\S]*?}'
+      replacement: ""  # delete resource
+  id: rcr_del
+
+# RAVR – Resource Attribute Value Replacement
+- category: RAVR
+  file_type: resource
+  mutation_type: RAVR_VAL_UP
+  patterns:
+    - pattern: '(?i)instance_type\s*=\s*".*"'
+      replacement: "instance_type = \"invalid.instance\""
+  id: ravr_val_up
+- category: RAVR
+  file_type: resource
+  mutation_type: RAVR_EXT_UP
+  patterns:
+    - pattern: '(?i)instance_type\s*=\s*".*"'
+      replacement: "instance_type = \"i3.metal\""
+  id: ravr_ext_up
+- category: RAVR
+  file_type: resource
+  mutation_type: RAVR_TYPE_UP
+  patterns:
+    - pattern: '(?i)instance_type\s*=\s*".*"'
+      replacement: "instance_type = { wrong = \"map\" }"
+  id: ravr_type_up
+
+# CMR – Count Meta-argument Replacement
+- category: CMR
+  file_type: meta_argument
+  mutation_type: CMR_ZERO_UP
+  patterns:
+    - pattern: '(?i)count\s*=\s*1'
+      replacement: "count = 0"
+  id: cmr_zero_up
+- category: CMR
+  file_type: meta_argument
+  mutation_type: CMR_NEG_UP
+  patterns:
+    - pattern: '(?i)count\s*=\s*1'
+      replacement: "count = -1"
+  id: cmr_neg_up
+- category: CMR
+  file_type: meta_argument
+  mutation_type: CMR_BIG_UP
+  patterns:
+    - pattern: '(?i)count\s*=\s*1'
+      replacement: "count = 10000"
+  id: cmr_big_up
+
+# PVCR – Provider/Module Version Constraint Replacement
+- category: PVCR
+  file_type: provider
+  mutation_type: PVCR_DOWN_UP
+  patterns:
+    - pattern: '(?i)version\s*=\s*"~>\s*5\.40"'
+      replacement: "version = \"~> 2.0\""
+  id: pvcr_down_up
+- category: PVCR
+  file_type: provider
+  mutation_type: PVCR_VER_DEL
+  patterns:
+    - pattern: '(?i)version\s*=.*'
+      replacement: "# version removed"
+  id: pvcr_ver_del
+- category: PVCR
+  file_type: provider
+  mutation_type: PVCR_INV_UP  
+  patterns:
+    - pattern: '(?i)version\s*=\s*"~>\s*5\.40"'
+      replacement: "version = \"999.0\""
+  id: pvcr_inv_up
+
+# NSRR – Network Security Rule Replacement
+- category: NSRR
+  file_type: security_group
+  mutation_type: NSRR_CIDR_UP
+  patterns:
+    - pattern: '(?i)cidr_blocks\s*=\s*\["10\.0\.0\.0/16"\]'
+      replacement: "cidr_blocks = [\"0.0.0.0/0\"]"
+  id: nsrr_cidr_up
+- category: NSRR
+  file_type: security_group
+  mutation_type: NSRR_RULE_DEL
+  patterns:
+    - pattern: '(?i)ingress\s*\{[\s\S]*?\}'
+      replacement: ""  # delete ingress/egress rule
+  id: nsrr_rule_del
+- category: NSRR
+  file_type: security_group
+  mutation_type: NSRR_PORT_UP
+  patterns:
+    - pattern: '(?i)from_port\s*=\s*22'
+      replacement: "from_port   = 3389"
+  id: nsrr_port_up
+
+# IVR – Input Variable Replacement
+- category: IVR
+  file_type: variable
+  mutation_type: IVR_VAL_UP
+  patterns:
+    - pattern: '(?i)default\s*=\s*"prod"'
+      replacement: "default = \"??invalid??\""
+  id: ivr_val_up
+- category: IVR
+  file_type: variable
+  mutation_type: IVR_VAL_DEL
+  patterns:
+    - pattern: '(?i)default\s*=.*'
+      replacement: "# default removed"
+  id: ivr_val_del
+- category: IVR
+  file_type: variable
+  mutation_type: IVR_TYPE_UP
+  patterns:
+    - pattern: '(?i)type\s*=\s*string'
+      replacement: "type    = map(any)"
+  id: ivr_type_up
 
 
 

@@ -1,0 +1,117 @@
+=== RUN   TestTerraformHelloWorldExample
+TestTerraformHelloWorldExample 2025-07-01T10:07:12-03:00 retry.go:91: terraform [init -upgrade=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:12-03:00 logger.go:66: Running command terraform with args [init -upgrade=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:12-03:00 logger.go:66: [0m[1mInitializing the backend...[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: [0m[1mInitializing provider plugins...[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: - Reusing previous version of hashicorp/archive from the dependency lock file
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: - Finding latest version of hashicorp/google...
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: - Reusing previous version of hashicorp/aws from the dependency lock file
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: - Using previously-installed hashicorp/archive v2.7.1
+TestTerraformHelloWorldExample 2025-07-01T10:07:13-03:00 logger.go:66: - Installing hashicorp/google v6.41.0...
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: - Installed hashicorp/google v6.41.0 (signed by HashiCorp)
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: - Using previously-installed hashicorp/aws v5.100.0
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: Terraform has made some changes to the provider dependency selections recorded
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: in the .terraform.lock.hcl file. Review those changes and commit them to your
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: version control system if they represent changes you intended to make.
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: [0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: [0m[32m
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: You may now begin working with Terraform. Try running "terraform plan" to see
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: any changes that are required for your infrastructure. All Terraform commands
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: should now work.
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: If you ever set or change modules or backend configuration for Terraform,
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: rerun this command to reinitialize your working directory. If you forget, other
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: commands will detect it and remind you to do so if necessary.[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 retry.go:91: terraform [plan -input=false -lock=false -lock=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:14-03:00 logger.go:66: Running command terraform with args [plan -input=false -lock=false -lock=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m[1mdata.archive_file.zipped_lambda_request: Reading...[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m[1mdata.archive_file.zipped_lambda_report: Reading...[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m[1mdata.archive_file.zipped_lambda_request: Read complete after 0s [id=2633390735be03d2e0189b9dba53a185d84a09a6][0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m[1mdata.archive_file.zipped_lambda_report: Read complete after 0s [id=cd9dba1ed72c93e100bdd63bcc8f3d5ad8be6daf][0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m[1m[31mPlanning failed.[0m[1m Terraform encountered an error while generating this plan.[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m╷[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid provider configuration[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m[0mProvider "registry.terraform.io/hashicorp/aws" requires explicit
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0mconfiguration. Add a provider block to the root module and configure the
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0mprovider's required arguments as described in the provider documentation.
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m╵[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m╷[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m[1m[31mError: [0m[0m[1mRetrieving AWS account details: validating provider credentials: retrieving caller identity from STS: operation error STS: GetCallerIdentity, https response error StatusCode: 403, RequestID: 31799ec7-2df9-4324-b05a-6a3cf7a0aa77, api error InvalidClientTokenId: The security token included in the request is invalid.[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m[0m  with provider["registry.terraform.io/hashicorp/aws"],
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m  on <empty> line 0:
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m  (source code not available)
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m│[0m [0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [31m╵[0m[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: [0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 retry.go:99: Returning due to fatal error: FatalError{Underlying: error while running command: exit status 1; [31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid provider configuration[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mProvider "registry.terraform.io/hashicorp/aws" requires explicit
+[31m│[0m [0mconfiguration. Add a provider block to the root module and configure the
+[31m│[0m [0mprovider's required arguments as described in the provider documentation.
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mRetrieving AWS account details: validating provider credentials: retrieving caller identity from STS: operation error STS: GetCallerIdentity, https response error StatusCode: 403, RequestID: 31799ec7-2df9-4324-b05a-6a3cf7a0aa77, api error InvalidClientTokenId: The security token included in the request is invalid.[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with provider["registry.terraform.io/hashicorp/aws"],
+[31m│[0m [0m  on <empty> line 0:
+[31m│[0m [0m  (source code not available)
+[31m│[0m [0m
+[31m╵[0m[0m}
+    plan.go:34: 
+        	Error Trace:	/home/asu/go/pkg/mod/github.com/gruntwork-io/terratest@v0.47.2/modules/terraform/plan.go:34
+        	            				/home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/terraform_hello_world_example_test.go:23
+        	Error:      	Received unexpected error:
+        	            	FatalError{Underlying: error while running command: exit status 1; [31m╷[0m[0m
+        	            	[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid provider configuration[0m
+        	            	[31m│[0m [0m
+        	            	[31m│[0m [0m[0mProvider "registry.terraform.io/hashicorp/aws" requires explicit
+        	            	[31m│[0m [0mconfiguration. Add a provider block to the root module and configure the
+        	            	[31m│[0m [0mprovider's required arguments as described in the provider documentation.
+        	            	[31m│[0m [0m
+        	            	[31m╵[0m[0m
+        	            	[31m╷[0m[0m
+        	            	[31m│[0m [0m[1m[31mError: [0m[0m[1mRetrieving AWS account details: validating provider credentials: retrieving caller identity from STS: operation error STS: GetCallerIdentity, https response error StatusCode: 403, RequestID: 31799ec7-2df9-4324-b05a-6a3cf7a0aa77, api error InvalidClientTokenId: The security token included in the request is invalid.[0m
+        	            	[31m│[0m [0m
+        	            	[31m│[0m [0m[0m  with provider["registry.terraform.io/hashicorp/aws"],
+        	            	[31m│[0m [0m  on <empty> line 0:
+        	            	[31m│[0m [0m  (source code not available)
+        	            	[31m│[0m [0m
+        	            	[31m╵[0m[0m}
+        	Test:       	TestTerraformHelloWorldExample
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 retry.go:91: terraform [destroy -auto-approve -input=false -lock=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:17-03:00 logger.go:66: Running command terraform with args [destroy -auto-approve -input=false -lock=false]
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: [0m[1m[32mNo changes.[0m[1m No objects need to be destroyed.[0m
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: 
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: [0mEither you have not created any objects yet or the existing objects were
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: already deleted outside of Terraform.
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: [0m[1m[32m
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: Destroy complete! Resources: 0 destroyed.
+TestTerraformHelloWorldExample 2025-07-01T10:07:19-03:00 logger.go:66: [0m
+--- FAIL: TestTerraformHelloWorldExample (7.30s)
+FAIL
+exit status 1
+FAIL	infrastructure_suite	7.344s
+===== DIFF =====
+--- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf.bckp
++++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf
+@@ -10,7 +10,7 @@
+   }
+ }
+ 
+-provider "aws" {
++provider "google" {
+   region = "us-east-1"
+   s3_use_path_style = true
+   skip_credentials_validation = true
+
+===== END DIFF =====
+
