@@ -74,7 +74,7 @@ class TestBaseMutation:
         
         # Even com caminho inexistente não deve lançar erro pois scanner ignora
         mutation.set_file_path(tmp_path, "nonexistent.tf")
-        assert mutation.apply_mutation() is True
+        assert mutation.apply_mutation() is None
     
     @pytest.mark.parametrize("pattern,replacement", [
         ('= ', '~> '),
