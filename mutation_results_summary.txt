@@ -1,7 +1,7 @@
 ==================== Mutation Results ====================
 
 [1] Mutant Program: vcr_3_tilde_gt_to_gte__idx0 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/vcr_3_tilde_gt_to_gte__idx0_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/vcr_3_tilde_gt_to_gte__idx0_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/vcr_3_tilde_gt_to_gte__idx0_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf
@@ -16,7 +16,7 @@
            source = "hashicorp/archive"
     ----- DIFF END -----
 [2] Mutant Program: pdr_name_replace__idx0 - Status: Failed (killed)
-    Output: Test: False saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/pdr_name_replace__idx0_output.txt
+    Output: Test: False saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/pdr_name_replace__idx0_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/pdr_name_replace__idx0_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/providers.tf
@@ -31,11 +31,11 @@
        skip_credentials_validation = true
     ----- DIFF END -----
 [3] Mutant Program: rcr_sg_cidr_up__idx0 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_cidr_up__idx0_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_cidr_up__idx0_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_cidr_up__idx0_output.txt
 [4] Mutant Program: rcr_sg_cidr_up__idx1 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_cidr_up__idx1_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_cidr_up__idx1_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_cidr_up__idx1_output.txt
 [5] Mutant Program: rcr_sg_from_up__idx0 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_from_up__idx0_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_from_up__idx0_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_from_up__idx0_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf
@@ -50,7 +50,7 @@
          cidr_blocks = ["0.0.0.0/0"]  # Allow HTTPS from anywhere (you can restrict this further)
     ----- DIFF END -----
 [6] Mutant Program: rcr_sg_from_up__idx1 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_from_up__idx1_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_from_up__idx1_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_from_up__idx1_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf
@@ -65,7 +65,7 @@
          cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
     ----- DIFF END -----
 [7] Mutant Program: rcr_sg_to_up__idx0 - Status: Success (alive)
-    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_to_up__idx0_output.txt
+    Output: Test: True saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_to_up__idx0_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_to_up__idx0_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf
@@ -80,7 +80,7 @@
        }
     ----- DIFF END -----
 [8] Mutant Program: rcr_sg_to_up__idx1 - Status: Failed (killed)
-    Output: Test: False saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_to_up__idx1_output.txt
+    Output: Test: False saved output file: /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/test/rcr_sg_to_up__idx1_output.txt  and copied to /home/asu/New folder/Terramutate/research_results/rcr_sg_to_up__idx1_output.txt
     ----- DIFF START -----
     --- /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf.bckp
     +++ /home/asu/New folder/Terramutate/terraform_mutated_copy/infrastructure/security-group.tf
@@ -94,7 +94,10 @@
          cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
        }
     ----- DIFF END -----
----------------------------------------------------------
-Total mutant programs generated & tested: 8
-Each program contains exactly 1 mutation, forming N mutant programs.
+
+Summary
+--------
+Total mutants tested : 8
+Killed (tests failed): 2
+Alive  (tests passed): 6
 =========================================================
