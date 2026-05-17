@@ -427,11 +427,30 @@ class MutationFramework:
                     # Apply single-occurrence mutation
                     diff_text = mutation_instance.apply_mutation(only_idx=idx)
 
+                    # Skip test when mutation produced no actual change (no-op replacement)
+                    if diff_text is None:
+                        print(f"[SKIP] {mutation_dict['id']}__idx{idx}: no-op mutation, skipping test.")
+                        mutation_instance.revert_mutation()
+                        continue
+
                     # Clone original dict to avoid side-effects across loop
                     idx_mut_dict = mutation_dict.copy()
                     idx_mut_dict["id"] = f"{mutation_dict['id']}__idx{idx}"
-                    if isinstance(diff_text, str):
-                        idx_mut_dict["_diff"] = diff_text
+                    idx_mut_dict["_diff"] = diff_text
+
+                    # Remove stale Terraform lock file so each test starts with a
+                    # fresh provider resolution – prevents lock file poisoning when
+                    # a previous mutation changed the version constraint.
+                    infra_folder_cfg = self.config_json["terraform_paths"].get(
+                        "infrastructure_folder", "infrastructure/"
+                    ).rstrip("/\\")
+                    terraform_dir = os.path.join(self.copy_path, "infrastructure", ".terraform")
+                    lock_file = os.path.join(self.copy_path, "infrastructure", ".terraform.lock.hcl")
+                    for path in (lock_file, terraform_dir):
+                        if os.path.isfile(path):
+                            os.remove(path)
+                        elif os.path.isdir(path):
+                            shutil.rmtree(path)
 
                     self.test_mutation(idx_mut_dict, category, False)
 
